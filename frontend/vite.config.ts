@@ -8,6 +8,16 @@ export default defineConfig(({ mode }) => {
       server: {
         port: 3000,
         host: '0.0.0.0',
+        allowedHosts: [
+          'hcimidfiprototype-production-93a9.up.railway.app',
+          '.railway.app'
+        ]
+      },
+      preview: {
+        allowedHosts: [
+          'hcimidfiprototype-production-93a9.up.railway.app',
+          '.railway.app'
+        ]
       },
       plugins: [react()],
       define: {

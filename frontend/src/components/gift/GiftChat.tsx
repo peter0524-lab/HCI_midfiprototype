@@ -59,11 +59,17 @@ export const GiftChat: React.FC<GiftChatProps> = ({ contact, onBack, addGiftToHi
   };
   
   const handleSelectGift = (rec: GiftRecommendation) => {
+    // Prevent double-click by checking if already processing
+    if (isLoading) return;
+    
     // Find the message block to ensure we don't re-select
     const messageBlock = messages.find(m => m.type === 'ai' && m.recommendations.includes(rec));
     if (messageBlock && messageBlock.type === 'ai' && messageBlock.selectedGiftName) {
       return; // A gift has already been selected from this block
     }
+
+    // Set loading to prevent multiple clicks
+    setIsLoading(true);
 
     const newGift: Gift = {
         name: rec.name,
@@ -87,6 +93,9 @@ export const GiftChat: React.FC<GiftChatProps> = ({ contact, onBack, addGiftToHi
         });
         return [...updatedMessages, confirmationMessage];
     });
+
+    // Reset loading after a short delay
+    setTimeout(() => setIsLoading(false), 500);
   };
 
   return (
@@ -111,7 +120,7 @@ export const GiftChat: React.FC<GiftChatProps> = ({ contact, onBack, addGiftToHi
       <main className="flex-grow p-4 overflow-y-auto bg-gray-50">
         <div className="space-y-6">
           {messages.map((msg, index) => (
-            <div key={index}>
+            <div key={`${msg.timestamp}-${index}`}>
               {msg.type === 'ai_intro' && (
                 <div className="flex items-start gap-3">
                   <div className="w-8 h-8 rounded-full bg-violet-600 text-white flex items-center justify-center flex-shrink-0"><LogoIcon className="w-5 h-5"/></div>

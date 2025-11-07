@@ -3,7 +3,9 @@ import cors from 'cors';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 import routes from './routes/index';
+import logRoutes from './routes/logRoutes';
 import { errorHandler } from './middleware/errorHandler';
+import { requestLogger, errorLogger } from './middleware/logger';
 
 dotenv.config();
 
@@ -34,16 +36,21 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
+app.use(requestLogger); // 커스텀 로거 추가
 
 // Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// Logs viewer
+app.use('/logs', logRoutes);
+
 // API Routes
 app.use('/api', routes);
 
 // Error handling
+app.use(errorLogger);
 app.use(errorHandler);
 
 export default app;

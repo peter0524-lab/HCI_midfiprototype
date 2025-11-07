@@ -6,5 +6,6 @@ app.listen(PORT, () => {
   console.log(`🚀 Server is running on http://localhost:${PORT}`);
   console.log(`📡 API endpoints: http://localhost:${PORT}/api`);
   console.log(`💚 Health check: http://localhost:${PORT}/health`);
+  console.log(`📊 Logs viewer: http://localhost:${PORT}/logs`);
 });
 

@@ -1,7 +1,0 @@
-{
-  "name": "Copy of GPT-4b: AI Gift Assistant - th",
-  "description": "GPT-4b is a business gift recommendation app with a business card UI. It helps professionals manage contacts and provides personalized gift suggestions powered by AI to enhance business relationships.",
-  "requestFramePermissions": [
-    "camera"
-  ]
-}

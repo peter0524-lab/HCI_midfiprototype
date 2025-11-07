@@ -171,6 +171,30 @@ lsof -ti:3001 | xargs kill -9
 - 백엔드 서버가 실행 중인지 확인
 - `frontend/.env.local`의 `VITE_API_URL` 확인
 
+## 🚀 Railway 배포
+
+### 자동 배포 스크립트 사용
+
+1. **Railway에 로그인**
+```bash
+railway login
+```
+
+2. **백엔드 배포**
+```bash
+./deploy-backend.sh
+```
+
+3. **프론트엔드 배포**
+```bash
+./deploy-frontend.sh
+# 백엔드 URL 입력 (Railway 대시보드에서 확인)
+```
+
+### 수동 배포
+
+자세한 배포 가이드는 [RAILWAY_DEPLOY.md](./RAILWAY_DEPLOY.md)를 참고하세요.
+
 ## 📄 라이선스
 
 MIT License
@@ -178,6 +202,8 @@ MIT License
 ## 👥 기여
 
 프로토타입 프로젝트입니다.
+
+**작성자**: taehwan (@peter0524-lab)
 
 ---
 

@@ -4,9 +4,6 @@ import { SplashScreen } from './components/auth/SplashScreen';
 import { LoginScreen } from './components/auth/LoginScreen';
 import { MainScreen } from './pages/MainScreen';
 import type { Contact, Gift, OcrData, Message, Conversation, User, Event } from './types';
-import { contactApi } from './services/contactApi';
-import { eventApi } from './services/eventApi';
-import { chatApi } from './services/chatApi';
 import { authApi } from './services/authApi';
 
 const App: React.FC = () => {
@@ -19,20 +16,51 @@ const App: React.FC = () => {
   const [userProfile, setUserProfile] = useState<User | null>(null);
   const [events, setEvents] = useState<Event[]>([]);
 
-  // Load initial data from API
+  // Load initial data from API (disabled for MVP demo - refresh resets all data)
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [contactsData, eventsData, chatsData, profileData] = await Promise.all([
-          contactApi.getAll(),
-          eventApi.getAll(),
-          chatApi.getAll(),
-          authApi.getProfile()
-        ]);
-        setContacts(contactsData);
-        setEvents(eventsData);
-        setChatHistory(chatsData);
+        // For MVP: Don't load previous data, start fresh on every refresh
+        // Load only user profile for display
+        const profileData = await authApi.getProfile();
         setUserProfile(profileData);
+        
+        // Initialize with sample contacts for MVP demo
+        const sampleContacts: Contact[] = [
+          {
+            id: '1',
+            name: '박서준',
+            company: '스타트업코리아',
+            title: '대표이사',
+            phone: '010-1234-5678',
+            email: 'park@startup.kr',
+            notes: '스타트업 액셀러레이터 운영 중. 혁신적인 제품을 좋아함',
+            giftHistory: []
+          },
+          {
+            id: '2',
+            name: '이하나',
+            company: '글로벌미디어',
+            title: '팀장',
+            phone: '010-2345-6789',
+            email: 'lee@globalmedia.com',
+            notes: '미디어 콘텐츠 제작 전문가. 감각적인 디자인 선호',
+            giftHistory: []
+          },
+          {
+            id: '3',
+            name: '김민수',
+            company: '디자인하우스',
+            title: '센터장',
+            phone: '010-3456-7890',
+            email: 'kim@designhouse.com',
+            notes: '미니멀리즘 인테리어 전문가. 심플하고 실용적인 것 선호',
+            giftHistory: []
+          }
+        ];
+        setContacts(sampleContacts);
+        setEvents([]);
+        setChatHistory([]);
       } catch (error) {
         console.error('Failed to load initial data:', error);
       } finally {
@@ -53,7 +81,12 @@ const App: React.FC = () => {
 
   const addContact = async (newContact: Omit<Contact, 'id' | 'giftHistory'>) => {
     try {
-      const created = await contactApi.create(newContact);
+      // For MVP: Create contact locally without saving to backend
+      const created: Contact = {
+        ...newContact,
+        id: Date.now().toString(),
+        giftHistory: []
+      };
       setContacts(prev => [...prev, created]);
       setOcrData(null);
     } catch (error) {
@@ -63,10 +96,10 @@ const App: React.FC = () => {
   
   const updateContact = async (updatedContact: Contact) => {
     try {
-      const updated = await contactApi.update(updatedContact.id, updatedContact);
-      setContacts(prev => prev.map(c => c.id === updated.id ? updated : c));
-      if (selectedContact?.id === updated.id) {
-        setSelectedContact(updated);
+      // For MVP: Update contact locally without saving to backend
+      setContacts(prev => prev.map(c => c.id === updatedContact.id ? updatedContact : c));
+      if (selectedContact?.id === updatedContact.id) {
+        setSelectedContact(updatedContact);
       }
     } catch (error) {
       console.error('Failed to update contact:', error);
@@ -75,7 +108,7 @@ const App: React.FC = () => {
 
   const deleteContact = async (contactId: string) => {
     try {
-      await contactApi.delete(contactId);
+      // For MVP: Delete contact locally without saving to backend
       setContacts(prev => prev.filter(c => c.id !== contactId));
       setSelectedContact(null);
     } catch (error) {
@@ -96,7 +129,12 @@ const App: React.FC = () => {
 
   const updateChatHistory = async (contactId: string, messages: Message[], conversationId?: string) => {
     try {
-      const saved = await chatApi.save(contactId, messages, conversationId);
+      // For MVP: Save chat locally without saving to backend
+      const saved: Conversation = {
+        id: conversationId || Date.now().toString(),
+        contactId,
+        messages
+      };
       setChatHistory(prev => {
         const existingIndex = prev.findIndex(c => c.id === saved.id);
         if (existingIndex > -1) {
@@ -122,7 +160,11 @@ const App: React.FC = () => {
 
   const addEvent = async (newEvent: Omit<Event, 'id'>) => {
     try {
-      const created = await eventApi.create(newEvent);
+      // For MVP: Create event locally without saving to backend
+      const created: Event = {
+        ...newEvent,
+        id: Date.now().toString()
+      };
       setEvents(prev => [...prev, created]);
     } catch (error) {
       console.error('Failed to add event:', error);
@@ -131,8 +173,8 @@ const App: React.FC = () => {
 
   const updateEvent = async (updatedEvent: Event) => {
     try {
-      const updated = await eventApi.update(updatedEvent.id, updatedEvent);
-      setEvents(prev => prev.map(e => e.id === updated.id ? updated : e));
+      // For MVP: Update event locally without saving to backend
+      setEvents(prev => prev.map(e => e.id === updatedEvent.id ? updatedEvent : e));
     } catch (error) {
       console.error('Failed to update event:', error);
     }
@@ -140,7 +182,7 @@ const App: React.FC = () => {
 
   const deleteEvent = async (eventId: string) => {
     try {
-      await eventApi.delete(eventId);
+      // For MVP: Delete event locally without saving to backend
       setEvents(prev => prev.filter(e => e.id !== eventId));
     } catch (error) {
       console.error('Failed to delete event:', error);

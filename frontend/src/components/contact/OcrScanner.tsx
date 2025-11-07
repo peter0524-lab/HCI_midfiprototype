@@ -55,7 +55,6 @@ export const OcrScanner: React.FC<OcrScannerProps> = ({ onBack, onScanComplete }
         setIsLoading(false);
     }
   };
-
   return (
     <motion.div
       key="ocrScanner"

@@ -31,9 +31,12 @@ railway up
 Railway 대시보드에서 설정하거나 CLI로 설정:
 
 ```bash
-railway variables set API_KEY=AIzaSyCJWzwhCar0-3npoJ0MwaRFd4Extt5Mo-w
-railway variables set CORS_ORIGIN=*
-# 또는 프론트엔드 배포 후: railway variables set CORS_ORIGIN=https://your-frontend-url.railway.app
+# 서비스 연결 (처음만)
+railway service
+
+# 환경 변수 설정
+railway variables --set "API_KEY=AIzaSyCJWzwhCar0-3npoJ0MwaRFd4Extt5Mo-w" --set "CORS_ORIGIN=*"
+# 또는 프론트엔드 배포 후: railway variables --set "CORS_ORIGIN=https://your-frontend-url.railway.app"
 ```
 
 백엔드가 배포되면 URL을 복사하세요 (예: `https://hci-prototype-backend.railway.app`)
@@ -51,7 +54,11 @@ railway init
 백엔드 URL을 환경 변수로 설정:
 
 ```bash
-railway variables set VITE_API_URL=https://hci-prototype-backend.railway.app
+# 서비스 연결 (처음만)
+railway service
+
+# 환경 변수 설정
+railway variables --set "VITE_API_URL=https://hcimidfiprototype-production.up.railway.app"
 ```
 
 ### 배포

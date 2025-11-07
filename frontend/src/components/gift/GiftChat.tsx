@@ -20,19 +20,25 @@ export const GiftChat: React.FC<GiftChatProps> = ({ contact, onBack, addGiftToHi
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
 
   const messagesRef = useRef(messages);
+  const hasUnsavedChanges = useRef(false);
 
   useEffect(() => {
     messagesRef.current = messages;
+    if (messages.length > 1) {
+      hasUnsavedChanges.current = true;
+    }
   }, [messages]);
 
   useEffect(() => {
     return () => {
-      // Always save on unmount if there are any meaningful messages.
-      if (messagesRef.current.length > 1) {
+      // Only save once on unmount if there are unsaved changes
+      if (hasUnsavedChanges.current && messagesRef.current.length > 1) {
+          hasUnsavedChanges.current = false;
           onSaveHistory(contact.id, messagesRef.current, conversationId);
       }
     };
-  }, [contact.id, onSaveHistory, conversationId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency array - only run on mount/unmount
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -63,13 +69,10 @@ export const GiftChat: React.FC<GiftChatProps> = ({ contact, onBack, addGiftToHi
     if (isLoading) return;
     
     // Find the message block to ensure we don't re-select
-    const messageBlock = messages.find(m => m.type === 'ai' && m.recommendations.includes(rec));
+    const messageBlock = messages.find(m => m.type === 'ai' && m.recommendations?.includes(rec));
     if (messageBlock && messageBlock.type === 'ai' && messageBlock.selectedGiftName) {
       return; // A gift has already been selected from this block
     }
-
-    // Set loading to prevent multiple clicks
-    setIsLoading(true);
 
     const newGift: Gift = {
         name: rec.name,
@@ -84,18 +87,24 @@ export const GiftChat: React.FC<GiftChatProps> = ({ contact, onBack, addGiftToHi
         timestamp: Date.now()
     };
 
+    // Single state update to prevent multiple renders
     setMessages(prev => {
+        // Check again inside setState to prevent race conditions
+        const hasSelection = prev.some(msg => 
+            msg.type === 'ai' && 
+            msg.recommendations?.includes(rec) && 
+            msg.selectedGiftName
+        );
+        if (hasSelection) return prev;
+
         const updatedMessages = prev.map(msg => {
-            if (msg.type === 'ai' && msg.recommendations.includes(rec)) {
+            if (msg.type === 'ai' && msg.recommendations?.includes(rec)) {
                 return { ...msg, selectedGiftName: rec.name };
             }
             return msg;
         });
         return [...updatedMessages, confirmationMessage];
     });
-
-    // Reset loading after a short delay
-    setTimeout(() => setIsLoading(false), 500);
   };
 
   return (
